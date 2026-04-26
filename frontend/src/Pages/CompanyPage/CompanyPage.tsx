@@ -16,6 +16,7 @@ const CompanyPage = () => {
   ];
 
   const [company, setCompany] = useState<any>();
+
   const [activeSidebarItem, setActiveSideBarItem] = useState<number>(1);
 
   useEffect(() => {
@@ -33,16 +34,16 @@ const CompanyPage = () => {
     <>
       {company ? (
         <div className="w-full relative flex overflow-x-hidden">
-          
-          {/* SIDEBAR */}
-          <Sidebar
-            tabItems={tabItems}
-            setActiveSideBarItem={setActiveSideBarItem}
-            activeSidebarItem={activeSidebarItem}
-          />
 
-          {/* DASHBOARD */}
+          <Sidebar
+  tabItems={tabItems}
+  setActiveSideBarItem={setActiveSideBarItem}
+  activeSidebarItem={activeSidebarItem}
+  ticker={ticker!}
+/>
+
           <CompanyDashboard
+            ticker={ticker!}
             tabItems={tabItems}
             activeSidebarItem={activeSidebarItem}
           >
@@ -54,6 +55,7 @@ const CompanyPage = () => {
               subTitle={company.marketCapitalization?.toString() || "N/A"}
             />
           </CompanyDashboard>
+
         </div>
       ) : (
         <div>Company Not Found!</div>
