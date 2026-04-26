@@ -1,7 +1,7 @@
 import axios from "axios";
 import {
   CompanyKeyMetrics,
-  CompanyKeyRatios,
+  CompanyBalanceSheet,
   CompanyProfile,
   CompanySearch,
   CompanyIncomeStatement,
@@ -59,5 +59,31 @@ export const getIncomeStatement = async (symbol: string) => {
   } catch (error: any) {
     console.log("error message: ", error.message);
     return null;
+  }
+};
+
+export const getBalanceSheet = async (symbol: string) => {
+  try {
+    const res = await axios.get(
+      `https://finnhub.io/api/v1/stock/financials-reported?symbol=${symbol}&token=${process.env.REACT_APP_API_KEY}`
+    );
+
+    return res.data;
+  } catch (error: any) {
+    console.log(error.message);
+    return null;
+  }
+};
+
+export const getCashFlow = async (symbol: string) => {
+  try {
+    const response = await axios.get(
+      `https://finnhub.io/api/v1/stock/financials-reported?symbol=${symbol}&token=${process.env.REACT_APP_API_KEY}`
+    );
+
+    return response.data.data;
+  } catch (error: any) {
+    console.log(error.message);
+    return [];
   }
 };

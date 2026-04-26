@@ -1,69 +1,53 @@
 import React, { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
-import { CompanyKeyMetrics } from "../../company";
-import { getKeyMetrics } from "../../api";
+import { getCompanyProfile } from "../../api";
 import RatioList from "../RatioList/RatioList";
-import Tile from "../Tile/Tile";
+import Spinner from "../Spinner/Spinner";
 
 type Props = {};
 
 const tableConfig = [
   {
+    label: "Company Name",
+    render: (company: any) => company.name,
+    subTitle: "Company name",
+  },
+  {
+    label: "Ticker",
+    render: (company: any) => company.ticker,
+    subTitle: "Stock symbol",
+  },
+  {
+    label: "Exchange",
+    render: (company: any) => company.exchange,
+    subTitle: "Stock exchange",
+  },
+  {
     label: "Market Cap",
-    render: (company: CompanyKeyMetrics) => company.marketCapitalization,
-    subTitle: "Total value of all a company's shares of stock",
-  },
-  {
-    label: "Current Ratio",
-    render: (company: CompanyKeyMetrics) => company.currentRatioAnnual,
-    subTitle:
-      "Measures the company's ability to pay short term debt obligations",
-  },
-  {
-    label: "Return On Equity",
-    render: (company: CompanyKeyMetrics) => company.roeTTM,
-    subTitle: "Measures profitability relative to shareholder equity",
-  },
-  {
-    label: "Return On Assets",
-    render: (company: CompanyKeyMetrics) => company.roaTTM,
-    subTitle: "Measures how efficiently a company uses its assets",
-  },
-  {
-    label: "Cash Flow Per Share",
-    render: (company: CompanyKeyMetrics) => company.cashFlowPerShareTTM,
-    subTitle: "Cash generated per share of stock",
-  },
-  {
-    label: "Book Value Per Share",
-    render: (company: CompanyKeyMetrics) =>
-      company.bookValuePerShareAnnual,
-    subTitle: "Net asset value per share",
+    render: (company: any) => company.marketCapitalization,
+    subTitle: "Total company value",
   },
 ];
 
 const CompanyProfile = (props: Props) => {
-    const ticker = useOutletContext<string>();
-  const [companyData, setCompanyData] = useState<CompanyKeyMetrics>();
+  const ticker = useOutletContext<string>();
+  const [companyData, setCompanyData] = useState<any>();
 
   useEffect(() => {
-    const getCompanyKeyRatios = async () => {
-      const value = await getKeyMetrics(ticker);
-
-    console.log("COMPANY DATA:", value);
-
-      setCompanyData(value);
+    const load = async () => {
+      const result = await getCompanyProfile(ticker);
+      setCompanyData(result);
     };
-    getCompanyKeyRatios();
-  }, []);
+
+    load();
+  }, [ticker]);
+
   return (
     <>
       {companyData ? (
-        <>
-          <RatioList config={tableConfig} data={companyData} />
-        </>
+        <RatioList config={tableConfig} data={companyData} />
       ) : (
-        <h1>No data found</h1>
+        <Spinner />
       )}
     </>
   );

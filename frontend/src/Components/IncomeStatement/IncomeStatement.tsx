@@ -3,10 +3,10 @@ import { useOutletContext } from "react-router-dom";
 import Table from "../Table/Table";
 import { CompanyIncomeStatement } from "../../company";
 import { getIncomeStatement } from "../../api";
+import Spinner from "../Spinner/Spinner";
 
 type Props = {};
 
-// 🔥 tenta achar o valor em diferentes statements (IC primeiro!)
 const getValue = (report: any, concepts: string[]) => {
   const data = report?.ic || report?.incomeStatement || report?.bs || [];
 
@@ -59,7 +59,6 @@ const IncomeStatement = (props: Props) => {
         return {
           year: item.year,
 
-          // 🔥 INCOME STATEMENT REAL (IC)
           revenue: getValue(report, [
             "us-gaap_RevenueFromContractWithCustomerExcludingAssessedTax",
             "us-gaap_Revenues",
@@ -94,7 +93,7 @@ const IncomeStatement = (props: Props) => {
       {incomeStatement ? (
         <Table config={configs} data={incomeStatement} />
       ) : (
-        <h1>Could not find income statement.</h1>
+        <Spinner />
       )}
     </>
   );

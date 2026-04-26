@@ -23,7 +23,7 @@ const Card: React.FC<Props> = ({
     >
       {/* Nome + símbolo */}
       <Link
-        to={`/company/${searchResult.symbol}`}
+        to={`/company/${searchResult.symbol}/company-profile`}
         className="font-bold text-center md:text-left"
       >
         ({searchResult.symbol}) - {searchResult.description || "Sem descrição"}
