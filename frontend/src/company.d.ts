@@ -3,8 +3,20 @@ export interface CompanySearch {
   exchangeShortName: string;
   name: string;
   stockExchange: string;
+  instrument_name: string;
+  exchange: string;
   symbol: string;
+  description: string;
+  type: string;
 }
+name: string;
+  ticker: string;
+  exchange: string;
+  country: string;
+  currency: string;
+  marketCapitalization: number;
+  logo: string;
+  weburl: string;
 
 export interface CompanyProfile {
   symbol: string;
@@ -42,6 +54,12 @@ export interface CompanyProfile {
   isActivelyTrading: boolean;
   isAdr: boolean;
   isFund: boolean;
+  name: string;
+  ticker: string;
+  country: string;
+  marketCapitalization: number;
+  logo: string;
+  weburl: string;
 }
 
 export interface CompanyKeyRatios {
