@@ -5,6 +5,7 @@ import {
   CompanyProfile,
   CompanySearch,
   CompanyIncomeStatement,
+  CompanyTenK,
 } from "./company";
 
 export interface SearchResponse {
@@ -85,5 +86,44 @@ export const getCashFlow = async (symbol: string) => {
   } catch (error: any) {
     console.log(error.message);
     return [];
+  }
+};
+
+export const getCompData = async (symbol: string) => {
+  try {
+    const response = await axios.get(
+      `https://finnhub.io/api/v1/stock/peers?symbol=${symbol}&token=${process.env.REACT_APP_API_KEY}`
+    );
+
+    return response.data; 
+  } catch (error: any) {
+    console.log("error message: ", error.message);
+    return [];
+  }
+};
+
+export const getTenK = async (symbol: string) => {
+  try {
+    const response = await axios.get(
+      `https://finnhub.io/api/v1/stock/filings?symbol=${symbol}&token=${process.env.REACT_APP_API_KEY}`
+    );
+
+    return response.data;
+  } catch (error: any) {
+    console.log(error.message);
+    return [];
+  }
+};
+
+export const getQuote = async (symbol: string) => {
+  try {
+    const response = await axios.get(
+      `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${process.env.REACT_APP_API_KEY}`
+    );
+
+    return response.data;
+  } catch (error: any) {
+    console.log(error.message);
+    return null;
   }
 };

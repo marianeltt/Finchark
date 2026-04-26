@@ -3,6 +3,10 @@ import { useOutletContext } from "react-router-dom";
 import { getCompanyProfile } from "../../api";
 import RatioList from "../RatioList/RatioList";
 import Spinner from "../Spinner/Spinner";
+import {
+  formatLargeMonetaryNumber,
+  formatLargeNonMonetaryNumber,
+} from "../../Helpers/NumberFormatting";
 
 type Props = {};
 
@@ -24,7 +28,8 @@ const tableConfig = [
   },
   {
     label: "Market Cap",
-    render: (company: any) => company.marketCapitalization,
+    render: (company: any) =>
+      formatLargeMonetaryNumber(company.marketCapitalization),
     subTitle: "Total company value",
   },
 ];

@@ -3,6 +3,7 @@ import { useOutletContext } from "react-router-dom";
 import { getCashFlow } from "../../api";
 import Table from "../Table/Table";
 import Spinner from "../Spinner/Spinner";
+import { formatLargeMonetaryNumber } from "../../Helpers/NumberFormatting";
 
 type Props = {};
 
@@ -33,35 +34,45 @@ const config = [
   },
   {
     label: "Operating Cashflow",
-    render: (company: CashFlow) => company.operatingCashFlow,
+    render: (company: CashFlow) =>
+      formatLargeMonetaryNumber(company.operatingCashFlow || 0),
   },
   {
     label: "CapEX",
-    render: (company: CashFlow) => company.capex,
+    render: (company: CashFlow) =>
+      formatLargeMonetaryNumber(company.capex || 0),
   },
   {
     label: "Investing Cashflow",
-    render: (company: CashFlow) => company.investingCashFlow,
+    render: (company: CashFlow) =>
+      formatLargeMonetaryNumber(company.investingCashFlow || 0),
   },
   {
     label: "Financing Cashflow",
-    render: (company: CashFlow) => company.financingCashFlow,
+    render: (company: CashFlow) =>
+      formatLargeMonetaryNumber(company.financingCashFlow || 0),
   },
   {
     label: "Free Cash Flow",
-    render: (company: CashFlow) => company.freeCashFlow,
+    render: (company: CashFlow) =>
+      formatLargeMonetaryNumber(company.freeCashFlow || 0),
   },
 ];
 
 const CashflowStatement = (props: Props) => {
   const ticker = useOutletContext<string>();
-  const [cashFlowData, setCashFlowData] = useState<CashFlow[]>();
+  const [cashFlowData, setCashFlowData] = useState<CashFlow[] | null>(null);
 
   useEffect(() => {
     const load = async () => {
       const result = await getCashFlow(ticker!);
 
-      const formatted = result.map((item: any) => {
+      if (!result || result.length === 0) {
+        setCashFlowData([]);
+        return;
+      }
+
+      const formatted: CashFlow[] = result.map((item: any) => {
         const report = item.report;
 
         const operating = getValue(report, [
@@ -81,12 +92,12 @@ const CashflowStatement = (props: Props) => {
         ]);
 
         return {
-          year: item.year,
+          year: item.year || "N/A",
           operatingCashFlow: operating,
           capex: capex,
           investingCashFlow: investing,
           financingCashFlow: financing,
-          freeCashFlow: operating - capex, 
+          freeCashFlow: operating - capex,
         };
       });
 
@@ -96,10 +107,18 @@ const CashflowStatement = (props: Props) => {
     load();
   }, [ticker]);
 
-  return cashFlowData ? (
-    <Table config={config} data={cashFlowData} />
-  ) : (
-    <Spinner />
+  return (
+    <>
+      {cashFlowData ? (
+        cashFlowData.length > 0 ? (
+          <Table config={config} data={cashFlowData} />
+        ) : (
+          <h1>No cashflow data found</h1>
+        )
+      ) : (
+        <Spinner />
+      )}
+    </>
   );
 };
 

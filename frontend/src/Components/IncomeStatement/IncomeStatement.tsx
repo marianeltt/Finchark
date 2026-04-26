@@ -4,11 +4,15 @@ import Table from "../Table/Table";
 import { CompanyIncomeStatement } from "../../company";
 import { getIncomeStatement } from "../../api";
 import Spinner from "../Spinner/Spinner";
+import {
+  formatLargeMonetaryNumber,
+  formatRatio,
+} from "../../Helpers/NumberFormatting";
 
 type Props = {};
 
 const getValue = (report: any, concepts: string[]) => {
-  const data = report?.ic || report?.incomeStatement || report?.bs || [];
+  const data = report?.ic || [];
 
   for (const concept of concepts) {
     const found = data.find((x: any) => x.concept === concept);
@@ -25,25 +29,35 @@ const configs = [
   },
   {
     label: "Total Revenue",
-    render: (company: CompanyIncomeStatement) => company.revenue,
+    render: (company: CompanyIncomeStatement) =>
+      formatLargeMonetaryNumber(company.revenue),
   },
   {
     label: "Net Income",
-    render: (company: CompanyIncomeStatement) => company.netIncome,
+    render: (company: CompanyIncomeStatement) =>
+      formatLargeMonetaryNumber(company.netIncome),
   },
   {
     label: "Operating Expenses",
-    render: (company: CompanyIncomeStatement) => company.operatingExpenses,
+    render: (company: CompanyIncomeStatement) =>
+      formatLargeMonetaryNumber(company.operatingExpenses),
   },
   {
     label: "Cost And Expenses",
-    render: (company: CompanyIncomeStatement) => company.costAndExpenses,
+    render: (company: CompanyIncomeStatement) =>
+      formatLargeMonetaryNumber(company.costAndExpenses),
+  },
+  {
+    label: "Gross Margin",
+    render: (company: CompanyIncomeStatement) =>
+      company.revenue > 0 && company.grossProfit > 0
+        ? formatRatio(company.grossProfit / company.revenue)
+        : "N/A",
   },
 ];
 
 const IncomeStatement = (props: Props) => {
   const ticker = useOutletContext<string>();
-
   const [incomeStatement, setIncomeStatement] =
     useState<CompanyIncomeStatement[]>();
 
@@ -51,36 +65,39 @@ const IncomeStatement = (props: Props) => {
     const load = async () => {
       const result = await getIncomeStatement(ticker!);
 
-      console.log("RAW DATA:", result);
+      if (!result || result.length === 0) return;
 
-      const formatted: CompanyIncomeStatement[] = result.map((item: any) => {
-        const report = item.report;
+      const formatted: CompanyIncomeStatement[] = result.map(
+        (item: any) => {
+          const report = item.report;
 
-        return {
-          year: item.year,
-
-          revenue: getValue(report, [
+          const revenue = getValue(report, [
             "us-gaap_RevenueFromContractWithCustomerExcludingAssessedTax",
             "us-gaap_Revenues",
             "us-gaap_SalesRevenueNet",
-          ]),
+          ]);
 
-          netIncome: getValue(report, [
-            "us-gaap_NetIncomeLoss",
-          ]),
+          const grossProfit = getValue(report, [
+            "us-gaap_GrossProfit",
+          ]);
 
-          operatingExpenses: getValue(report, [
-            "us-gaap_OperatingExpenses",
-          ]),
-
-          costAndExpenses: getValue(report, [
-            "us-gaap_CostOfRevenue",
-            "us-gaap_CostOfGoodsAndServicesSold",
-          ]),
-        };
-      });
-
-      console.log("FORMATTED DATA:", formatted);
+          return {
+            year: item.year,
+            revenue,
+            netIncome: getValue(report, [
+              "us-gaap_NetIncomeLoss",
+            ]),
+            operatingExpenses: getValue(report, [
+              "us-gaap_OperatingExpenses",
+            ]),
+            costAndExpenses: getValue(report, [
+              "us-gaap_CostOfRevenue",
+              "us-gaap_CostOfGoodsAndServicesSold",
+            ]),
+            grossProfit,
+          };
+        }
+      );
 
       setIncomeStatement(formatted);
     };
@@ -88,14 +105,10 @@ const IncomeStatement = (props: Props) => {
     load();
   }, [ticker]);
 
-  return (
-    <>
-      {incomeStatement ? (
-        <Table config={configs} data={incomeStatement} />
-      ) : (
-        <Spinner />
-      )}
-    </>
+  return incomeStatement ? (
+    <Table config={configs} data={incomeStatement} />
+  ) : (
+    <Spinner />
   );
 };
 

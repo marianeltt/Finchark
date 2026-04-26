@@ -341,3 +341,12 @@ export interface CompanyIncomeStatement {
   operatingExpenses: number;
   costAndExpenses: number;
 }
+
+export type CompanyCompData = string[];
+
+export interface CompanyTenK {
+  symbol: string;
+  filedDate: string;
+  reportUrl: string;
+  form: string;
+}
