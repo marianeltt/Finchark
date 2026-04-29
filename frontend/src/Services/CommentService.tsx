@@ -1,0 +1,47 @@
+import axios from "axios";
+import { CommentPost, CommentGet } from "../Models/Comment";
+import { handleError } from "../Helpers/ErrorHandler";
+
+const api = "http://localhost:5037/api/comment/";
+
+export const commentPostAPI = async (
+    title: string,
+    content: string,
+    symbol: string
+) => {
+    try {
+        const data = await axios.post<CommentPost>(
+            api + `${symbol}`,
+            {
+                title,
+                content,
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+            }
+        );
+
+        return data;
+    } catch (error) {
+        handleError(error);
+    }
+};
+
+export const commentGetAPI = async (symbol: string) => {
+    try {
+        const data = await axios.get<CommentGet[]>(
+            api + `?Symbol=${symbol}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+            }
+        );
+
+        return data;
+    } catch (error) {
+        handleError(error);
+    }
+};

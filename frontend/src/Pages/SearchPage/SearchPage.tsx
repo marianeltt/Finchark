@@ -35,16 +35,21 @@ const SearchPage = (props: Props) => {
   };
 
   const onSearchSubmit = async (e: SyntheticEvent) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  const result = await searchCompanies(search);
+    if (!localStorage.getItem("token")) {
+      window.location.href = "/login";
+      return;
+    }
 
-  if (typeof result === "string") {
-    setServerError(result);
-  } else if (Array.isArray(result)) {
-    setSearchResult(result);
-  }
-};
+    const result = await searchCompanies(search);
+
+    if (typeof result === "string") {
+      setServerError(result);
+    } else if (Array.isArray(result)) {
+      setSearchResult(result);
+    }
+  };
 
   return (
     <>

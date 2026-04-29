@@ -3,6 +3,8 @@ import { useOutletContext } from "react-router-dom";
 import { getCompanyProfile } from "../../api";
 import RatioList from "../RatioList/RatioList";
 import Spinner from "../Spinner/Spinner";
+import StockComment from "../StockComment/StockComment";
+
 import {
   formatLargeMonetaryNumber,
   formatLargeNonMonetaryNumber,
@@ -50,7 +52,10 @@ const CompanyProfile = (props: Props) => {
   return (
     <>
       {companyData ? (
-        <RatioList config={tableConfig} data={companyData} />
+          <>
+            <RatioList config={tableConfig} data={companyData} />
+            <StockComment stockSymbol={ticker} />
+          </>
       ) : (
         <Spinner />
       )}
