@@ -6,6 +6,11 @@ using api.Dtos.Comment;
 using api.Interfaces;
 using api.Mappers;
 using Microsoft.AspNetCore.Mvc;
+using api.Extensions;
+using api.Models;
+using Microsoft.AspNetCore.Identity;
+using api.Helpers;
+using Microsoft.AspNetCore.Authorization;
 
 namespace api.Controllers
 {
@@ -15,19 +20,27 @@ namespace api.Controllers
     {
         private readonly ICommentRepository _commentRepo;
         private readonly IStockRepository _stockRepo;
-        public CommentController(ICommentRepository commentRepo, IStockRepository stockRepo)
+        private readonly UserManager<AppUser> _userManager;
+        private readonly IFinnhubService _finnhubService;
+        
+        public CommentController(ICommentRepository commentRepo,
+            IStockRepository stockRepo, UserManager<AppUser> userManager,
+            IFinnhubService finnhubService)
         {
             _commentRepo = commentRepo;
             _stockRepo = stockRepo;
+            _userManager = userManager;
+            _finnhubService = finnhubService;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        [Authorize]
+        public async Task<IActionResult> GetAll([FromQuery] CommentQueryObject queryObject)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var comments = await _commentRepo.GetAllAsync();
+            var comments = await _commentRepo.GetAllAsync(queryObject);
 
             var commentDto = comments.Select(s => s.ToCommentDto());
 
@@ -51,18 +64,32 @@ namespace api.Controllers
         }
 
         [HttpPost]
-        [Route("{stockId:int}")]
-        public async Task<IActionResult> Create([FromRoute] int stockId, CreateCommentDto commentDto)
+        [Route("{symbol:alpha}")]
+        public async Task<IActionResult> Create([FromRoute] string symbol, CreateCommentDto commentDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (!await _stockRepo.StockExists(stockId))
-            {
-                return BadRequest("Stock does not exist");
-            }
+            var stock = await _stockRepo.GetBySymbolAsync(symbol);
 
-            var commentModel = commentDto.ToCommentFromCreate(stockId);
+            if (stock == null)
+            {
+                stock = await _finnhubService.FindStockBySymbolAsync(symbol);
+                if (stock == null)
+                {
+                    return BadRequest("Stock does not exists");
+                }
+                else
+                {
+                    await _stockRepo.CreateAsync(stock);
+                }
+            }
+            
+            var username = User.GetUsername();
+            var appUser = await _userManager.FindByNameAsync(username);
+
+            var commentModel = commentDto.ToCommentFromCreate(stock.Id);
+            commentModel.AppUserId = appUser.Id;
             await _commentRepo.CreateAsync(commentModel);
             return CreatedAtAction(nameof(GetById), new { id = commentModel.Id }, commentModel.ToCommentDto());
         }

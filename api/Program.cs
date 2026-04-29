@@ -94,6 +94,9 @@ builder.Services.AddScoped<IStockRepository, StockRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IPortfolioRepository, PortfolioRepository>();
+builder.Services.AddScoped<IFinnhubService, FinnhubService>();
+builder.Services.AddHttpClient<IFinnhubService, FinnhubService>();
+builder.Services.AddCors();
 
 var app = builder.Build();
 
@@ -105,6 +108,12 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors(x => x
+    .AllowAnyMethod()
+    .AllowAnyHeader()
+    .AllowCredentials()
+    .SetIsOriginAllowed(origin => true));
 
 app.UseAuthentication();
 app.UseAuthorization();

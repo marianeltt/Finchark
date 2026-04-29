@@ -36,5 +36,18 @@ namespace api.Mappers
                 MarketCap = stockDto.MarketCap
             };
         }
+        
+        public static Stock ToStockFromFinnhub(this FinnhubStock finnhubStock)
+        {
+            return new Stock
+            {
+                Symbol = finnhubStock.ticker,
+                CompanyName = finnhubStock.name,
+                Purchase = 0,
+                LastDiv = 0,
+                Industry = finnhubStock.finnhubIndustry,
+                MarketCap = (long)(finnhubStock.marketCapitalization * 1000000)
+            };
+        }
     }
 }
