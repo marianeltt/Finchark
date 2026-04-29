@@ -9,12 +9,18 @@ import Hero from "./Components/Hero/Hero";
 import Navbar from "./Components/Navbar/Navbar";
 import { Outlet } from "react-router";
 import "./App.css";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
+import { UserProvider } from "./Context/useAuth";
 
 function App() {
   return (
     <>
-      <Navbar />
-      <Outlet />
+        <UserProvider>
+            <Navbar />
+            <Outlet />
+            <ToastContainer />
+        </UserProvider>
     </>
   );
 }
