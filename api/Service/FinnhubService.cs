@@ -5,6 +5,7 @@ using api.Dtos.Stock;
 using api.Interfaces;
 using api.Mappers;
 using api.Models;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 
 namespace api.Service
@@ -24,7 +25,7 @@ namespace api.Service
         {
             try
             {
-                var apiKey = _config["FinnhubKey"];
+                var apiKey = _config["Finnhub:ApiKey"];
 
                 var result = await _httpClient.GetAsync(
                     $"https://finnhub.io/api/v1/stock/profile2?symbol={symbol}&token={apiKey}"
