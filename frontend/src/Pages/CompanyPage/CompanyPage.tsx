@@ -6,6 +6,7 @@ import Tile from "../../Components/Tile/Tile";
 import Spinner from "../../Components/Spinner/Spinner";
 import CompFinder from "../../Components/CompFinder/CompFinder";
 import TenKFinder from "../../Components/TenKFinder/TenKFinder";
+import { formatLargeMonetaryNumber } from "../../Helpers/NumberFormatting";
 
 const CompanyPage = () => {
   const { ticker } = useParams();
@@ -42,12 +43,11 @@ const CompanyPage = () => {
                 title="Market Cap"
                 subTitle={
                   company.marketCapitalization
-                    ? company.marketCapitalization.toString()
+                    ? formatLargeMonetaryNumber(Number(company.marketCapitalization))
                     : "N/A"
                 }
               />
 
-              {/* ✅ NOVOS TILES (Finnhub quote) */}
               <Tile
                 title="Price"
                 subTitle={quote ? "$" + quote.c : "N/A"}

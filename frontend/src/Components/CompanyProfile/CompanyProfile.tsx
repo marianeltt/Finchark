@@ -31,7 +31,7 @@ const tableConfig = [
   {
     label: "Market Cap",
     render: (company: any) =>
-      formatLargeMonetaryNumber(company.marketCapitalization),
+    formatLargeMonetaryNumber(company.marketCapitalization),
     subTitle: "Total company value",
   },
 ];
